@@ -1,6 +1,6 @@
-# Contratos (cadastro-contatos)
+# Contratos (controle_contratos)
 
-Um app para salvar os contratos
+Um projeto para fazer o controle dos contratos ativos
 
 ## Install the dependencies
 ```bash

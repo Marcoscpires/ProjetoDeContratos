@@ -12,10 +12,10 @@
         />
 
         <q-toolbar-title>
-          ProJuris
+          Quasar App
         </q-toolbar-title>
 
-        <div><q-btn flat icon="logout"></q-btn></div>
+        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
@@ -30,7 +30,7 @@
           header
           class="text-grey-8"
         >
-          Menu
+          Essential Links
         </q-item-label>
         <EssentialLink
           v-for="link in essentialLinks"

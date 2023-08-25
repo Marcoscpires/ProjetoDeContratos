@@ -10,7 +10,7 @@
 
 const ESLintPlugin = require('eslint-webpack-plugin')
 
-module.exports = function (/* ctx */) {
+module.exports = function (ctx) {
   return {
     // https://v1.quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
@@ -22,7 +22,8 @@ module.exports = function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v1.quasar.dev/quasar-cli/boot-files
     boot: [
-      'i18n'
+      'i18n',
+      'axios'
     ],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -46,7 +47,13 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: 'history',
+      env: {
+        API_URL: ctx.dev
+          ? 'http://localhost:1623'
+          : 'http://localhost:1623'
+      },
+      // available values: 'hash', 'history'
 
       // transpile: false,
 
@@ -75,7 +82,7 @@ module.exports = function (/* ctx */) {
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
     devServer: {
       https: false,
-      port: 7589,
+      port: 8080,
       open: true // opens browser window automatically
     },
 
@@ -98,7 +105,10 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify',
+        'Dialog'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
@@ -115,9 +125,9 @@ module.exports = function (/* ctx */) {
       workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
-        name: 'Contartos',
-        short_name: 'Contartos',
-        description: 'Um app para salvar os contratos',
+        name: 'Contratos',
+        short_name: 'Contratos',
+        description: 'Um projeto para fazer o controle dos contratos ativos',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#ffffff',
@@ -182,7 +192,7 @@ module.exports = function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'cadastro-contatos'
+        appId: 'controle_contratos'
       },
 
       // More info: https://v1.quasar.dev/quasar-cli/developing-electron-apps/node-integration
