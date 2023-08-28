@@ -1,6 +1,13 @@
 <template>
    <q-page padding>
     <div class="q-pa-md">
+      <q-form
+      @submit="onSubmit"
+      @reset="onReset"
+      class="q-gutter-md"
+      >
+      
+      </q-form>
       <q-table flat bordered :data="posts" :columns="columns" row-key="name">
         <template v-slot:top>
           <span class="text-h5">Contratos</span>
@@ -8,7 +15,7 @@
         </template>
         <template v-slot:body-cell-actions="props">
           <q-td :props="props" class="q-gutter-sm">
-            <q-btn glossy icon="delete" color="negative" dense size="sm" @click="handleDeletePost(props.row.id)" />
+            <q-btn glossy icon="delete" color="negative" dense size="sm" @click="handleDeletePost(props.row.contSid)" />
             <q-btn glossy icon="print" color="green" dense size="sm" @click="handleDeletePost(props.row.id)" />
             <q-btn glossy icon="edit" color="info" dense size="sm"  @click="handleEditPost(props.row.id)" />
           </q-td>
@@ -19,7 +26,7 @@
 </template>
 
 <script>
-import { api } from 'boot/axios'
+import postsService from 'src/services/posts'
 export default {
   name: 'IndexPage',
   data () {
@@ -47,15 +54,32 @@ export default {
     this.getPosts()
   },
   methods: {
-    getPosts () {
-      api.get('contratos')
-        .then((res) => {
-          this.posts = res.data
-        })
-        .catch((err) => {
-          console.log(err)
-        })
+    async getPosts () {
+      const { list } = postsService()
+      try {
+        const data = await list()
+        this.posts = data
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    handleDeletePost (id) {
+      const { remove } = postsService()
+      this.$q.dialog({
+        title: 'Deletar contrato',
+        message: 'Tem certeza que quer apagar esse contrato?',
+        cancel: true,
+        persistent: true
+      }).onOk(() => {
+        try {
+          remove(id)
+          this.getPosts()
+        } catch (error) {
+          console.error(error)
+        }
+      })
     }
+
   }
 }
 </script>

@@ -6,5 +6,6 @@ const TaskController = require('../controllers/TaskController')
 router.post('/contratos', TaskController.inserirContratos)
 router.get('/contratos',TaskController.listarContratos)
 router.get('/contratos/:id',TaskController.listarUmContrato)
+router.delete('/contratos/:id',TaskController.excluirContrato)
 
 module.exports = router

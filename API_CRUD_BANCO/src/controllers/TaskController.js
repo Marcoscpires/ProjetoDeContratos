@@ -4,8 +4,6 @@ class TaskController {
     inserirContratos(request, response){
 
         const {contNum, contTipo, contNome, contDtIn, contDtfim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao} = request.body
-
-        console.log(contNum, contTipo, contNome, contDtIn, contDtfim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao)
         
         database.insert({contNum, contTipo, contNome, contDtIn, contDtfim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao}).table("contratos").then(data=>{
             console.log(data)
@@ -33,8 +31,14 @@ class TaskController {
         })
     }
 
-    putContratos(request, response){
-        database.wj
+    excluirContrato(request, response){
+        const id = request.params
+
+        database.where({contSid:id["id"]}).del().table("contratos").then(data=>{
+            response.json({message: "Contrato removido com sucesso"})
+        }).catch(error=>{
+            response.json(error)
+        })
     }
 
 }
