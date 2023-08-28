@@ -12,10 +12,12 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Contratos
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>
+          <q-btn round flat dense icon="logout"></q-btn>
+        </div>
       </q-toolbar>
     </q-header>
 
