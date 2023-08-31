@@ -8,7 +8,7 @@
           <div class="row q-gutter-md">
             <div class="col-2 q-gutter-md column items-center self-center">
               <q-btn glossy label="Salvar" color="primary" class="float-right" icon="save" type="submit"></q-btn>
-              <q-btn glossy label="Cancelar" color="write" class="float-right" text-color="primary"></q-btn>
+              <q-btn glossy label="Cancelar" color="write" class="float-right" text-color="primary" @click="clearForm()"></q-btn>
             </div>
             <div class="col-9 q-gutter-sm row">
               <q-input outlined v-model="form.contNum" label="N Contrato" lazy-rules class="col-lg-1 col-xs-12" />
@@ -30,9 +30,15 @@
               <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" />
               <q-input outlined v-model="form.contPenalidadeRescisao" label="Penalidade recisão" lazy-rules
                 class="col-lg-2 col-xs-12" />
+                <q-file color="purple-12" v-model="file" label="Contrato" name="teste">
+                  <template v-slot:prepend>
+                    <q-icon name="attach_file" />
+                  </template>
+                </q-file>
             </div>
           </div>
         </q-form>
+        {{ file }}
       </div>
       <div class="col-12 q-gutter-md">
         <q-table  dense flat bordered :data="posts" :columns="columns" row-key="name">
@@ -44,7 +50,7 @@
             <q-td :props="props" class="q-gutter-sm">
               <q-btn glossy icon="delete" color="negative" dense size="sm" @click="handleDeletePost(props.row.contSid)" />
               <q-btn glossy icon="print" color="green" dense size="sm" @click="handleDeletePost(props.row.id)" />
-              <q-btn glossy icon="edit" color="info" dense size="sm"  @click="handleEditPost(props.row.id)" />
+              <q-btn glossy icon="edit" color="info" dense size="sm"  @click="handleEditPost(props.row.contSid)" />
             </q-td>
           </template>
         </q-table>
@@ -54,11 +60,12 @@
 </template>
 
 <script>
-import postsService from 'src/services/posts'
+import { list, post, remove, listById, update, upload } from 'src/services/UseApi'
 export default {
   name: 'IndexPage',
   data () {
     const form = ({
+      contSid: '',
       contNum: '',
       contTipo: '',
       contNome: '',
@@ -73,6 +80,7 @@ export default {
       contPenalidadeRescisao: ''
     })
     return {
+      file: null,
       form,
       columns: [
         { name: 'contSid', label: 'ID', field: 'contSid', sortable: true, aling: 'left' },
@@ -97,8 +105,24 @@ export default {
     this.getPosts()
   },
   methods: {
+    clearForm () {
+      this.form = ({
+        contNum: '',
+        contTipo: '',
+        contNome: '',
+        contDtIn: '',
+        contDtFim: '',
+        contRenovacaoAuto: '',
+        contPrazoDununcia: '',
+        contValor: '',
+        contPrazoPGT: '',
+        contObjContrato: '',
+        contIndiceAjuste: '',
+        contPenalidadeRescisao: ''
+      })
+      this.file = null
+    },
     async getPosts () {
-      const { list } = postsService()
       try {
         const data = await list()
         this.posts = data
@@ -107,7 +131,6 @@ export default {
       }
     },
     handleDeletePost (id) {
-      const { remove } = postsService()
       this.$q.dialog({
         title: 'Deletar contrato',
         message: 'Tem certeza que quer apagar esse contrato?',
@@ -122,18 +145,41 @@ export default {
         }
       })
     },
-    handleEditPost () {
-      console.log('atualizado')
+    async handleEditPost (id) {
+      console.log(this.form)
+      const data = await listById(id)
+      console.log(data)
+      this.form = data
+      console.log(this.form)
+    },
+    async postContratos (form, file) {
+      try {
+        const formData = new FormData()
+        formData.append('teste', file)
+        await post(form)
+        await upload(formData)
+        await this.clearForm()
+        await this.getPosts()
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async updateContratos (form) {
+      await update(form)
+      await this.clearForm()
+      await this.getPosts()
     },
     async onSubmit () {
-      const { post } = postsService()
-      console.log(this.form.value)
       try {
-        await post(this.form)
+        if (this.form.contSid) {
+          this.updateContratos(this.form, this.file)
+        } else {
+          this.postContratos(this.form)
+          this.$q.notify({ message: 'Salvo', icon: 'check', color: 'positive' })
+        }
       } catch (error) {
         console.error(error)
       }
-      this.$q.notify({ message: 'Salvo', icon: 'check', color: 'positive' })
     }
 
   }
