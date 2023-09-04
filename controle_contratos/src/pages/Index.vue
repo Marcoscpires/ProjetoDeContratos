@@ -30,15 +30,11 @@
               <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" />
               <q-input outlined v-model="form.contPenalidadeRescisao" label="Penalidade recisão" lazy-rules
                 class="col-lg-2 col-xs-12" />
-                <q-file color="purple-12" v-model="file" label="Contrato" name="teste">
-                  <template v-slot:prepend>
-                    <q-icon name="attach_file" />
-                  </template>
-                </q-file>
+                <input type="file" ref="fileInput" @change="uploadFile" />
             </div>
           </div>
         </q-form>
-        {{ file }}
+        {{ fileInput }}
       </div>
       <div class="col-12 q-gutter-md">
         <q-table  dense flat bordered :data="posts" :columns="columns" row-key="name">
@@ -60,7 +56,7 @@
 </template>
 
 <script>
-import { list, post, remove, listById, update, upload } from 'src/services/UseApi'
+import { list, post, remove, listById, update } from 'src/services/UseApi'
 export default {
   name: 'IndexPage',
   data () {
@@ -105,6 +101,22 @@ export default {
     this.getPosts()
   },
   methods: {
+    uploadFile () {
+      const fileInput = this.$refs.fileInput
+      const file = fileInput.files[0]
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        fetch('http://localhost:1623/upload', {
+          method: 'POST',
+          body: formData
+        }).then((response) => response.json()).then((data) => {
+          console.log('Arquivo enviado com sucesso:', data)
+        }).catch((error) => {
+          console.error('Erro ao enviar o arquivo:', error)
+        })
+      }
+    },
     clearForm () {
       this.form = ({
         contNum: '',
@@ -154,10 +166,8 @@ export default {
     },
     async postContratos (form, file) {
       try {
-        const formData = new FormData()
-        formData.append('teste', file)
         await post(form)
-        await upload(formData)
+        this.uploadFile()
         await this.clearForm()
         await this.getPosts()
       } catch (error) {

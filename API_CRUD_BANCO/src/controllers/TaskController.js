@@ -74,19 +74,6 @@ class TaskController {
         })
 
     }
-
-    sendFile(request,response){
-        const file = request.file.teste
-        console.log(file)
-        file.mv('uploads/' + file.name, function(err, result) {
-            if(err)
-                throw err;
-            response.send({
-                sucess: true,
-                message: "File uploaded!"
-            })
-        })
-    }
 }
 
 module.exports = new TaskController()

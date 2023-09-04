@@ -51,6 +51,7 @@ const upload = async (file) => {
     throw new Error(error)
   }
 }
+
 export {
   upload,
   list,
