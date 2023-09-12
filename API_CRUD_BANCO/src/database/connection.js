@@ -4,7 +4,7 @@ var knex = require('knex')({
         host : 'localhost',      
         user : 'root',     
         password : '123123', 
-        database : 'ti_teste' 
+        database : 'biovel_marcos' 
      }
 });
 module.exports = knex
