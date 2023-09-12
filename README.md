@@ -1,4 +1,4 @@
-# Istrução de instalação do projeto
+# Instrução de instalação do projeto
 
 ## instalar nodemon e quasar:
 
