@@ -27,7 +27,7 @@
 	contIndiceAjuste varchar(10),
 	contPenalidadeRescisao varchar(20)
 	PRIMARY KEY(contSid)
-)
+    )
 
 ## Iniciar programa
 
