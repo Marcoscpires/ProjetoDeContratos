@@ -1,6 +1,18 @@
 const database = require('../database/connection')
 const { format } = require('date-fns')
+const multer = require('multer') 
 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, 'uploads/'); // Define a pasta de destino dos uploads
+    },
+    filename: (req, file, cb) => {
+      const fileName = `${file.originalname}`;
+      cb(null, fileName); // Define o nome do arquivo no servidor
+    },
+})
+
+const upload = multer({ storage });
 
 class TaskController {
     inserirContratos(request, response){
@@ -16,25 +28,8 @@ class TaskController {
     }
     listarContratos(request, response){
         database.select("*").table("contratos").then(contratos=>{
-            const contratosFormatados = contratos.map(contrato => {
-                return {
-                    contSid: contrato.contSid,
-                    contNum: contrato.contNum, 
-                    contTipo: contrato.contTipo, 
-                    contNome: contrato.contNome, 
-                    contRenovacaoAuto: contrato.contRenovacaoAuto, 
-                    contPrazoDununcia: contrato.contPrazoDununcia, 
-                    contValor: contrato.contValor, 
-                    contPrazoPGT: contrato.contPrazoPGT, 
-                    contObjContrato: contrato.contObjContrato, 
-                    contIndiceAjuste: contrato.contIndiceAjuste, 
-                    contPenalidadeRescisao: contrato.contPenalidadeRescisao,
-                    contDtIn: format(new Date(contrato.contDtIn), 'yyyy-MM-dd'),
-                    contDtFim: format(new Date(contrato.contDtIn), 'yyyy-MM-dd')
-                }
-            })
-            console.log(contratosFormatados)
-            response.json(contratosFormatados)
+            console.log(contratos)
+            response.json(contratos)
         }).catch(error=>{
             console.log(error)
         })
@@ -73,6 +68,20 @@ class TaskController {
             response.json(error)
         })
 
+    }
+
+    salvarArquivo(request,response) {
+        try {
+            upload.single('file')(request,response, (error) => {
+                if(error) {
+                    return response.status(400).json({error: 'Erro ao fazer upload do arquivo'})
+                }
+                return response.json({ message: 'Arquivo enviado com sucesso' });
+            })
+        } catch (error) {
+            console.error(error);
+            response.status(500).json({ error: 'Erro interno do servidor' });
+        }
     }
 }
 

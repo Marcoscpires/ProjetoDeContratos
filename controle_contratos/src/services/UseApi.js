@@ -45,7 +45,7 @@ const remove = async (id) => {
 
 const upload = async (file) => {
   try {
-    const { data } = await api.post('file', file)
+    const { data } = await api.post('upload', file)
     return data
   } catch (error) {
     throw new Error(error)

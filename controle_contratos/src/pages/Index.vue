@@ -56,7 +56,7 @@
 </template>
 
 <script>
-import { list, post, remove, listById, update } from 'src/services/UseApi'
+import { list, post, remove, listById, update, upload } from 'src/services/UseApi'
 export default {
   name: 'IndexPage',
   data () {
@@ -101,21 +101,12 @@ export default {
     this.getPosts()
   },
   methods: {
-    uploadFile () {
+    async uploadFile () {
       const fileInput = this.$refs.fileInput
       const file = fileInput.files[0]
-      if (file) {
-        const formData = new FormData()
-        formData.append('file', file)
-        fetch('http://localhost:1623/upload', {
-          method: 'POST',
-          body: formData
-        }).then((response) => response.json()).then((data) => {
-          console.log('Arquivo enviado com sucesso:', data)
-        }).catch((error) => {
-          console.error('Erro ao enviar o arquivo:', error)
-        })
-      }
+      const formData = new FormData()
+      formData.append('file', file)
+      await upload(formData)
     },
     clearForm () {
       this.form = ({
@@ -132,7 +123,6 @@ export default {
         contIndiceAjuste: '',
         contPenalidadeRescisao: ''
       })
-      this.file = null
     },
     async getPosts () {
       try {
@@ -185,6 +175,7 @@ export default {
           this.updateContratos(this.form, this.file)
         } else {
           this.postContratos(this.form)
+          this.uploadFile()
           this.$q.notify({ message: 'Salvo', icon: 'check', color: 'positive' })
         }
       } catch (error) {
