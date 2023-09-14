@@ -30,11 +30,14 @@
               <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" />
               <q-input outlined v-model="form.contPenalidadeRescisao" label="Penalidade recisão" lazy-rules
                 class="col-lg-2 col-xs-12" />
-                <input type="file" ref="fileInput" @change="uploadFile" />
+              <q-file outlined v-model="arquivo" class="col-lg-2 col-xs-12">
+                <template v-slot:prepend>
+                  <q-icon name="attach_file" />
+                </template>
+              </q-file>
             </div>
           </div>
         </q-form>
-        {{ fileInput }}
       </div>
       <div class="col-12 q-gutter-md">
         <q-table  dense flat bordered :data="posts" :columns="columns" row-key="name">
@@ -56,7 +59,7 @@
 </template>
 
 <script>
-import { list, post, remove, listById, update, upload } from 'src/services/UseApi'
+import { list, post, remove, listById, update, postWithFile } from 'src/services/UseApi'
 export default {
   name: 'IndexPage',
   data () {
@@ -76,7 +79,7 @@ export default {
       contPenalidadeRescisao: ''
     })
     return {
-      file: null,
+      arquivo: null,
       form,
       columns: [
         { name: 'contSid', label: 'ID', field: 'contSid', sortable: true, aling: 'left' },
@@ -97,17 +100,18 @@ export default {
       posts: []
     }
   },
+
   mounted () {
     this.getPosts()
   },
+
   methods: {
     async uploadFile () {
-      const fileInput = this.$refs.fileInput
-      const file = fileInput.files[0]
       const formData = new FormData()
-      formData.append('file', file)
-      await upload(formData)
+      formData.append('file', this.arquivo)
+      await postWithFile(formData)
     },
+
     clearForm () {
       this.form = ({
         contNum: '',
@@ -123,7 +127,9 @@ export default {
         contIndiceAjuste: '',
         contPenalidadeRescisao: ''
       })
+      this.arquivo = null
     },
+
     async getPosts () {
       try {
         const data = await list()
@@ -132,6 +138,7 @@ export default {
         console.error(error)
       }
     },
+
     handleDeletePost (id) {
       this.$q.dialog({
         title: 'Deletar contrato',
@@ -147,6 +154,7 @@ export default {
         }
       })
     },
+
     async handleEditPost (id) {
       console.log(this.form)
       const data = await listById(id)
@@ -154,28 +162,29 @@ export default {
       this.form = data
       console.log(this.form)
     },
+
     async postContratos (form, file) {
       try {
         await post(form)
-        this.uploadFile()
         await this.clearForm()
         await this.getPosts()
       } catch (error) {
         console.log(error)
       }
     },
+
     async updateContratos (form) {
       await update(form)
       await this.clearForm()
       await this.getPosts()
     },
+
     async onSubmit () {
       try {
         if (this.form.contSid) {
           this.updateContratos(this.form, this.file)
         } else {
           this.postContratos(this.form)
-          this.uploadFile()
           this.$q.notify({ message: 'Salvo', icon: 'check', color: 'positive' })
         }
       } catch (error) {

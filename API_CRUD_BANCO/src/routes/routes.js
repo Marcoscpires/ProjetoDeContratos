@@ -8,7 +8,6 @@ router.get('/contratos',TaskController.listarContratos)
 router.get('/contratos/:id',TaskController.listarUmContrato)
 router.delete('/contratos/:id',TaskController.excluirContrato)
 router.put('/contratos/:id',TaskController.atualizarContrato)
-router.post('/upload', TaskController.salvarArquivo)
 
 
 

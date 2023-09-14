@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
       cb(null, 'uploads/'); // Define a pasta de destino dos uploads
     },
     filename: (req, file, cb) => {
-      const fileName = `${file.originalname}`;
+      const fileName = `file`;
       cb(null, fileName); // Define o nome do arquivo no servidor
     },
 })
@@ -17,14 +17,16 @@ const upload = multer({ storage });
 class TaskController {
     inserirContratos(request, response){
 
+        console.log("request body:" + request.body)
         const {contNum, contTipo, contNome, contDtIn, contDtFim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao} = request.body
-        
+         
         database.insert({contNum, contTipo, contNome, contDtIn, contDtFim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao}).table("contratos").then(data=>{
             console.log(data)
             response.json({message:"Contrato cadastrato"})
         }).catch(error=>{
             console.log(error.errnor)
         })
+        console.log("numero" + contNum)
     }
     listarContratos(request, response){
         database.select("*").table("contratos").then(contratos=>{
@@ -71,17 +73,7 @@ class TaskController {
     }
 
     salvarArquivo(request,response) {
-        try {
-            upload.single('file')(request,response, (error) => {
-                if(error) {
-                    return response.status(400).json({error: 'Erro ao fazer upload do arquivo'})
-                }
-                return response.json({ message: 'Arquivo enviado com sucesso' });
-            })
-        } catch (error) {
-            console.error(error);
-            response.status(500).json({ error: 'Erro interno do servidor' });
-        }
+       
     }
 }
 
