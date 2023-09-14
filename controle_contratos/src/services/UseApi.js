@@ -26,9 +26,9 @@ const post = async (form) => {
     throw new Error(error)
   }
 }
-const postWithFile = async (form) => {
+const upload = async (file, id) => {
   try {
-    const { data } = await api.post('contratos', form)
+    const { data } = await api.post(`upload/${id}`, file)
     return data
   } catch (error) {
     throw new Error(error)
@@ -52,7 +52,7 @@ const remove = async (id) => {
 }
 
 export {
-  postWithFile,
+  upload,
   list,
   listById,
   post,

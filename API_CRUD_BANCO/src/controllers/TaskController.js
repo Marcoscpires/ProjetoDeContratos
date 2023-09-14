@@ -2,35 +2,18 @@ const database = require('../database/connection')
 const { format } = require('date-fns')
 const multer = require('multer') 
 
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, 'uploads/'); // Define a pasta de destino dos uploads
-    },
-    filename: (req, file, cb) => {
-      const fileName = `file`;
-      cb(null, fileName); // Define o nome do arquivo no servidor
-    },
-})
-
-const upload = multer({ storage });
-
 class TaskController {
     inserirContratos(request, response){
-
-        console.log("request body:" + request.body)
         const {contNum, contTipo, contNome, contDtIn, contDtFim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao} = request.body
          
         database.insert({contNum, contTipo, contNome, contDtIn, contDtFim, contRenovacaoAuto, contPrazoDununcia, contValor, contPrazoPGT, contObjContrato, contIndiceAjuste, contPenalidadeRescisao}).table("contratos").then(data=>{
-            console.log(data)
             response.json({message:"Contrato cadastrato"})
         }).catch(error=>{
-            console.log(error.errnor)
+            console.log(error.error)
         })
-        console.log("numero" + contNum)
     }
     listarContratos(request, response){
         database.select("*").table("contratos").then(contratos=>{
-            console.log(contratos)
             response.json(contratos)
         }).catch(error=>{
             console.log(error)
@@ -41,7 +24,6 @@ class TaskController {
         database.select("*").table("contratos").where({contSid:id["id"]}).first().then(contrato=>{
             contrato.contDtIn = format(new Date(contrato.contDtIn), 'yyyy-MM-dd');
             contrato.contDtFim = format(new Date(contrato.contDtFim), 'yyyy-MM-dd');
-            console.log(contrato)
             response.json(contrato)
         }).catch(error=>{
             console.log(error)
@@ -73,7 +55,31 @@ class TaskController {
     }
 
     salvarArquivo(request,response) {
-       
+        const id = request.params.id
+        try {
+            const storage = multer.diskStorage({
+                destination: (req, file, cb) => {
+                cb(null, 'uploads/'); // Define a pasta de destino dos uploads
+                },
+                filename: (req, file, cb) => {
+                const fileName = `${id}.pdf`;
+                cb(null, fileName); // Define o nome do arquivo no servidor
+                }
+            })
+            
+            const upload = multer({ storage });
+            upload.single('file') (request,response, (error) => {
+            if (error) {
+                console.log('Erro ao fazer upload do arquivo.')
+                return response.status(400).json({error: 'Erro ao fazer upload do arquivo.'})
+            }
+            console.log('Arquivo enviado com sucesso')
+            return response.json({message: 'Arquivo enviado com sucesso'})
+            })
+        }catch (error) {
+            console.error(error)
+            response.status(500).json({ error: 'Erro interno do servidor' })
+        }
     }
 }
 

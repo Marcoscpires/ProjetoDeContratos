@@ -3,6 +3,7 @@
     <div class="row q-pa-md q-gutter-md">
       <div class="col-12 q-gutter-md">
         <q-form
+        ref="meuFormulario"
         @submit="onSubmit"
         class="q-gutter-md">
           <div class="row q-gutter-md">
@@ -11,25 +12,47 @@
               <q-btn glossy label="Cancelar" color="write" class="float-right" text-color="primary" @click="clearForm()"></q-btn>
             </div>
             <div class="col-9 q-gutter-sm row">
-              <q-input outlined v-model="form.contNum" label="N Contrato" lazy-rules class="col-lg-1 col-xs-12" />
-              <q-input outlined v-model="form.contTipo" label="Tipo" lazy-rules class="col-lg-3 col-xs-12" />
-              <q-input outlined v-model="form.contNome" label="Nome" lazy-rules class="col-lg-5 col-xs-12" />
-              <q-input outlined v-model="form.contDtIn" label="Data inicio" mask="##/##/####" lazy-rules
-                class="col-lg-2 col-xs-12" type="date">
+              <q-input outlined v-model="form.contNum" ref="numeroCont" label="N Contrato" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']" />
+              <q-input outlined v-model="form.contTipo" label="Tipo" lazy-rules class="col-lg-3 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contNome" label="Nome" lazy-rules class="col-lg-4 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contDtIn" label="Data inicio" mask="date" lazy-rules
+                class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio', 'date']">
+                <template v-slot:append>
+                  <q-icon name="event">
+                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                      <q-date v-model="form.contDtIn">
+                        <div class="row items-center justify-end">
+                          <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
               </q-input>
               <q-input outlined v-model="form.contRenovacaoAuto" label="Renovação automatica" lazy-rules
-                class="col-lg-3 col-xs-12" />
-              <q-input outlined v-model="form.contPrazoDununcia" label="Prazo denuncia" lazy-rules class="col-lg-4 col-xs-12" />
-              <q-input outlined v-model="form.contValor" label="Valor" lazy-rules class="col-lg-2 col-xs-12" />
-              <q-input outlined v-model="form.contDtFim" label="Data fim" mask="##/##/####" lazy-rules
-                class="col-lg-2 col-xs-12" type="date">
+                class="col-lg-3 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contPrazoDununcia" label="Prazo denuncia" lazy-rules class="col-lg-4 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contValor" label="Valor" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contDtFim" label="Data fim" mask="date" lazy-rules
+                class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']">
+                <template v-slot:append>
+                  <q-icon name="event">
+                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                      <q-date v-model="form.contDtFim">
+                        <div class="row items-center justify-end">
+                          <q-btn v-close-popup label="Close" color="primary" flat />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
               </q-input>
-              <q-input outlined v-model="form.contPrazoPGT" label="Prazo PGT" lazy-rules class="col-lg-2 col-xs-12" />
+              <q-input outlined v-model="form.contPrazoPGT" label="Prazo PGT" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']" />
               <q-input outlined v-model="form.contObjContrato" label="Objeto de contrato" lazy-rules
-                class="col-lg-3 col-xs-12" />
-              <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" />
+                class="col-lg-3 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
               <q-input outlined v-model="form.contPenalidadeRescisao" label="Penalidade recisão" lazy-rules
-                class="col-lg-2 col-xs-12" />
+                class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
               <q-file outlined v-model="arquivo" class="col-lg-2 col-xs-12">
                 <template v-slot:prepend>
                   <q-icon name="attach_file" />
@@ -59,7 +82,7 @@
 </template>
 
 <script>
-import { list, post, remove, listById, update, postWithFile } from 'src/services/UseApi'
+import { list, post, remove, listById, update, upload } from 'src/services/UseApi'
 export default {
   name: 'IndexPage',
   data () {
@@ -106,12 +129,6 @@ export default {
   },
 
   methods: {
-    async uploadFile () {
-      const formData = new FormData()
-      formData.append('file', this.arquivo)
-      await postWithFile(formData)
-    },
-
     clearForm () {
       this.form = ({
         contNum: '',
@@ -128,6 +145,7 @@ export default {
         contPenalidadeRescisao: ''
       })
       this.arquivo = null
+      this.$refs.meuFormulario.reset()
     },
 
     async getPosts () {
@@ -166,8 +184,16 @@ export default {
     async postContratos (form, file) {
       try {
         await post(form)
-        await this.clearForm()
         await this.getPosts()
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async uploadFile (id) {
+      const formData = new FormData()
+      formData.append('file', this.arquivo)
+      try {
+        await upload(formData, id)
       } catch (error) {
         console.log(error)
       }
@@ -175,16 +201,21 @@ export default {
 
     async updateContratos (form) {
       await update(form)
-      await this.clearForm()
       await this.getPosts()
     },
 
     async onSubmit () {
       try {
         if (this.form.contSid) {
-          this.updateContratos(this.form, this.file)
+          await this.updateContratos(this.form, this.file)
+          await this.uploadFile(this.form.contNum)
+          this.clearForm()
+          this.$refs.meuFormulario.reset()
         } else {
-          this.postContratos(this.form)
+          await this.postContratos(this.form)
+          await this.uploadFile(this.form.contNum)
+          this.clearForm()
+          this.$refs.meuFormulario.reset()
           this.$q.notify({ message: 'Salvo', icon: 'check', color: 'positive' })
         }
       } catch (error) {
