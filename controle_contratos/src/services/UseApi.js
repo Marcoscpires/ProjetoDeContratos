@@ -18,6 +18,15 @@ const listById = async (id) => {
     throw new Error(error)
   }
 }
+const download = async (id) => {
+  try {
+    const response = await api.get(`contratos/download/${id}`)
+    console.log(response.data)
+    return response.data
+  } catch (error) {
+    throw new Error(error)
+  }
+}
 const post = async (form) => {
   try {
     const { data } = await api.post('contratos', form)
@@ -28,7 +37,7 @@ const post = async (form) => {
 }
 const upload = async (file, id) => {
   try {
-    const { data } = await api.post(`upload/${id}`, file)
+    const { data } = await api.post(`contratos/upload/${id}`, file)
     return data
   } catch (error) {
     throw new Error(error)
@@ -53,6 +62,7 @@ const remove = async (id) => {
 
 export {
   upload,
+  download,
   list,
   listById,
   post,

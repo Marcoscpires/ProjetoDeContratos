@@ -1,6 +1,7 @@
 const database = require('../database/connection')
 const { format } = require('date-fns')
-const multer = require('multer') 
+const multer = require('multer')
+const path = require('path')
 
 class TaskController {
     inserirContratos(request, response){
@@ -80,6 +81,18 @@ class TaskController {
             console.error(error)
             response.status(500).json({ error: 'Erro interno do servidor' })
         }
+    }
+
+    buscarArquivo(request,response) {
+        const filename = `${request.params.id}.pdf`
+        const filePath = path.join(__dirname, '..\\..\\uploads', filename)
+        console.log(filePath)
+
+        response.sendFile(filePath, (err) => {
+            if (err) {
+                response.status(500).json({ error: 'Erro ao baixar o arquivo'})
+            }
+        })
     }
 }
 

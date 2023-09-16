@@ -53,8 +53,8 @@
               <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
               <q-input outlined v-model="form.contPenalidadeRescisao" label="Penalidade recisão" lazy-rules
                 class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
-              <q-file outlined v-model="arquivo" class="col-lg-2 col-xs-12">
-                <template v-slot:prepend>
+              <q-file outlined v-model="arquivo" label="Contrato" class="col-lg-2 col-xs-12"  accept="application/pdf">
+                <template v-slot:append>
                   <q-icon name="attach_file" />
                 </template>
               </q-file>
@@ -71,7 +71,7 @@
           <template v-slot:body-cell-actions="props">
             <q-td :props="props" class="q-gutter-sm">
               <q-btn glossy icon="delete" color="negative" dense size="sm" @click="handleDeletePost(props.row.contSid)" />
-              <q-btn glossy icon="print" color="green" dense size="sm" @click="handleDeletePost(props.row.id)" />
+              <q-btn glossy icon="print" color="green" dense size="sm" @click="downloadFile(props.row.contNum)" />
               <q-btn glossy icon="edit" color="info" dense size="sm"  @click="handleEditPost(props.row.contSid)" />
             </q-td>
           </template>
@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { list, post, remove, listById, update, upload } from 'src/services/UseApi'
+import { list, post, remove, listById, update, upload, download } from 'src/services/UseApi'
 export default {
   name: 'IndexPage',
   data () {
@@ -173,10 +173,15 @@ export default {
       })
     },
 
+    async downloadFile (id) {
+      window.location.href = `http://localhost:1623/contratos/download/${id}`
+    },
+
     async handleEditPost (id) {
       console.log(this.form)
       const data = await listById(id)
       console.log(data)
+      this.arquivo = download(this.form.contNum)
       this.form = data
       console.log(this.form)
     },
