@@ -37,7 +37,7 @@ const post = async (form) => {
 }
 const upload = async (file, id) => {
   try {
-    const { data } = await api.post(`contratos/upload/${id}`, file)
+    const { data } = await api.post(`/contratos/upload/${id}`, file)
     return data
   } catch (error) {
     throw new Error(error)
