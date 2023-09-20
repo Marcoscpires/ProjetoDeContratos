@@ -2,6 +2,7 @@ const database = require('../database/connection')
 const { format } = require('date-fns')
 const multer = require('multer')
 const path = require('path')
+const fs = require('fs')
 
 class TaskController {
     inserirContratos(request, response){
@@ -21,8 +22,8 @@ class TaskController {
         })
     }
     listarUmContrato(request, response){
-        const id = request.params
-        database.select("*").table("contratos").where({contSid:id["id"]}).first().then(contrato=>{
+        const id = request.params.id
+        database.select("*").table("contratos").where({contSid:id}).first().then(contrato=>{
             contrato.contDtIn = format(new Date(contrato.contDtIn), 'yyyy-MM-dd');
             contrato.contDtFim = format(new Date(contrato.contDtFim), 'yyyy-MM-dd');
             response.json(contrato)
@@ -31,13 +32,26 @@ class TaskController {
         })
     }
 
-    excluirContrato(request, response){
+    async excluirContrato(request, response){
         const id = request.params.id
-        database.where({contSid:id}).del().table("contratos").then(data=>{
-            response.json({message: "Contrato removido com sucesso"})
-        }).catch(error=>{
-            response.json(error)
-        })
+        let filename = ''
+        let filePath = ''
+        try {
+            const numCont = await database.select("contNum").table("contratos").where({ contSid:id })
+            filename = `${numCont[0].contNum}.pdf`
+            filePath = path.join(__dirname, '..\\..\\uploads', filename)
+            await database.where({contSid:id}).del().table("contratos")
+            await fs.unlink(filePath, (err) => {
+                if (err) {
+                    console.error(`Erro ao excluir o arquivo: ${err}`);
+                } else {
+                    console.log(`Arquivo ${filePath} excluído com sucesso.`);
+                }
+            })
+            response.json({ message: "Contrato removido com sucesso" });
+        } catch (error){
+            console.log(error)
+        }
     }
 
     atualizarContrato(request,response){
@@ -91,6 +105,16 @@ class TaskController {
         response.sendFile(filePath, (err) => {
             if (err) {
                 response.status(500).json({ error: 'Erro ao baixar o arquivo'})
+            }
+        })
+    }
+
+    excluirArquivo(caminhoDoArquivo) {
+        fs.unlink(caminhoDoArquivo, (err) => {
+            if (err) {
+                console.error(`Erro ao excluir o arquivo: ${err}`);
+            } else {
+                console.log(`Arquivo ${caminhoDoArquivo} excluído com sucesso.`);
             }
         })
     }
