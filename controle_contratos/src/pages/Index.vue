@@ -174,7 +174,7 @@ export default {
     },
 
     async downloadFile (id) {
-      window.location.href = `http://localhost:1623/contratos/download/${id}`
+      window.open(`http://10.4.0.150:1623/contratos/download/${id}`)
     },
 
     async handleEditPost (id) {

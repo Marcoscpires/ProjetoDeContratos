@@ -50,8 +50,8 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       env: {
         API_URL: ctx.dev
-          ? 'http://localhost:1623'
-          : 'http://localhost:1623'
+          ? 'http://10.4.0.150:1623'
+          : 'http://10.4.0.150:1623'
       },
       // available values: 'hash', 'history'
 
