@@ -108,16 +108,6 @@ class TaskController {
             }
         })
     }
-
-    excluirArquivo(caminhoDoArquivo) {
-        fs.unlink(caminhoDoArquivo, (err) => {
-            if (err) {
-                console.error(`Erro ao excluir o arquivo: ${err}`);
-            } else {
-                console.log(`Arquivo ${caminhoDoArquivo} excluído com sucesso.`);
-            }
-        })
-    }
 }
 
 module.exports = new TaskController()
