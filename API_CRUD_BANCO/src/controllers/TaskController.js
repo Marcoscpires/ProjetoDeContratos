@@ -81,15 +81,18 @@ class TaskController {
                 cb(null, fileName); // Define o nome do arquivo no servidor
                 }
             })
-            
             const upload = multer({ storage });
             upload.single('file') (request,response, (error) => {
-            if (error) {
-                console.log('Erro ao fazer upload do arquivo.')
-                return response.status(400).json({error: 'Erro ao fazer upload do arquivo.'})
-            }
-            console.log('Arquivo enviado com sucesso')
-            return response.json({message: 'Arquivo enviado com sucesso'})
+                if (error) {
+                    console.log('Erro ao fazer upload do arquivo.')
+                    return response.status(400).json({error: 'Erro ao fazer upload do arquivo.'})
+                }
+                    console.log('Arquivo enviado com sucesso')   
+            })
+            database.where({ contNum: id }).update({ file: id }).table("contratos").then(data => {
+                response.log('Contrato atualizado co sucesso')
+            }).catch(error => {
+                response.status(500).json(error)
             })
         }catch (error) {
             console.error(error)
@@ -100,8 +103,7 @@ class TaskController {
     buscarArquivo(request,response) {
         const filename = `${request.params.id}.pdf`
         const filePath = path.join(__dirname, '..\\..\\uploads', filename)
-        console.log(filePath)
-
+        
         response.sendFile(filePath, (err) => {
             if (err) {
                 response.status(500).json({ error: 'Erro ao baixar o arquivo'})

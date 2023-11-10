@@ -71,7 +71,7 @@
           <template v-slot:body-cell-actions="props">
             <q-td :props="props" class="q-gutter-sm">
               <q-btn glossy icon="delete" color="negative" dense size="sm" @click="handleDeletePost(props.row.contSid)" />
-              <q-btn glossy icon="print" color="green" dense size="sm" @click="downloadFile(props.row.contNum)" />
+              <q-btn glossy icon="print" v-if="mostraBotao(props.row.file)" color="green" dense size="sm" @click="downloadFile(props.row.contNum)" />
               <q-btn glossy icon="edit" color="info" dense size="sm"  @click="handleEditPost(props.row.contSid)" />
             </q-td>
           </template>
@@ -129,6 +129,10 @@ export default {
   },
 
   methods: {
+    mostraBotao (valor) {
+      return valor !== null
+    },
+
     clearForm () {
       this.form = ({
         contNum: '',
@@ -167,6 +171,7 @@ export default {
         try {
           await remove(id)
           await this.getPosts()
+          this.$q.notify({ message: 'Contrato excluido', icon: 'delete', color: 'positive' })
         } catch (error) {
           console.error(error)
         }
@@ -174,7 +179,7 @@ export default {
     },
 
     async downloadFile (id) {
-      window.open(`http://10.4.0.150:1623/contratos/download/${id}`)
+      window.open(`http://10.4.0.151:1623/contratos/download/${id}`)
     },
 
     async handleEditPost (id) {
@@ -189,18 +194,20 @@ export default {
     async postContratos (form, file) {
       try {
         await post(form)
-        await this.getPosts()
       } catch (error) {
         console.log(error)
       }
     },
+
     async uploadFile (id) {
       const formData = new FormData()
-      formData.append('file', this.arquivo)
-      try {
-        await upload(formData, id)
-      } catch (error) {
-        console.log(error)
+      if (this.arquivo !== null) {
+        formData.append('file', this.arquivo)
+        try {
+          await upload(formData, id)
+        } catch (error) {
+          console.log(error)
+        }
       }
     },
 
@@ -214,11 +221,13 @@ export default {
         if (this.form.contSid) {
           await this.updateContratos(this.form, this.file)
           await this.uploadFile(this.form.contNum)
+          await this.getPosts()
           this.clearForm()
           this.$refs.meuFormulario.reset()
         } else {
           await this.postContratos(this.form)
           await this.uploadFile(this.form.contNum)
+          await this.getPosts()
           this.clearForm()
           this.$refs.meuFormulario.reset()
           this.$q.notify({ message: 'Salvo', icon: 'check', color: 'positive' })
