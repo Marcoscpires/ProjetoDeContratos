@@ -1,17 +1,13 @@
 <template>
    <q-page padding>
-    <div class="row q-pa-md q-gutter-md">
+    <div class="row q-pa-md q-gutter-md justify-center">
       <div class="col-12 q-gutter-md">
         <q-form
         ref="meuFormulario"
         @submit="onSubmit"
         class="q-gutter-md">
-          <div class="row q-gutter-md">
-            <div class="col-2 q-gutter-md column items-center self-center">
-              <q-btn glossy label="Salvar" color="primary" class="float-right" icon="save" type="submit"></q-btn>
-              <q-btn glossy label="Cancelar" color="write" class="float-right" text-color="primary" @click="clearForm()"></q-btn>
-            </div>
-            <div class="col-9 q-gutter-sm row">
+          <div class="row justify-center">
+            <div class="col-8 q-gutter-xs row">
               <q-input outlined v-model="form.contNum" ref="numeroCont" label="N Contrato" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']" />
               <q-input outlined v-model="form.contTipo" label="Tipo" lazy-rules class="col-lg-3 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
               <q-input outlined v-model="form.contNome" label="Nome" lazy-rules class="col-lg-4 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
@@ -31,9 +27,10 @@
               </q-input>
               <q-input outlined v-model="form.contRenovacaoAuto" label="Renovação automatica" lazy-rules
                 class="col-lg-3 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
-              <q-input outlined v-model="form.contPrazoDununcia" label="Prazo denuncia" lazy-rules class="col-lg-4 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
+              <q-input outlined v-model="form.contPrazoDununcia" label="Prazo denuncia" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
               <q-input outlined v-model="form.contValor" label="Valor" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
-              <q-input outlined v-model="form.contDtFim" label="Data fim" mask="date" lazy-rules
+                <q-input outlined v-model="form.contPrazoPGT" label="Prazo PGT" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']" />
+                <q-input outlined v-model="form.contDtFim" label="Data fim" mask="date" lazy-rules
                 class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']">
                 <template v-slot:append>
                   <q-icon name="event">
@@ -47,7 +44,6 @@
                   </q-icon>
                 </template>
               </q-input>
-              <q-input outlined v-model="form.contPrazoPGT" label="Prazo PGT" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']" />
               <q-input outlined v-model="form.contObjContrato" label="Objeto de contrato" lazy-rules
                 class="col-lg-3 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
               <q-input outlined v-model="form.contIndiceAjuste" label="Indice de ajuste" lazy-rules class="col-lg-2 col-xs-12" :rules="[val => !!val || 'Campo obrigatorio']"/>
@@ -58,11 +54,15 @@
                   <q-icon name="attach_file" />
                 </template>
               </q-file>
-            </div>
+              <div class="col-lg-2 col-xs-12">
+                <q-btn label="Salvar" color="primary" class="float-right" icon="save" type="submit"></q-btn>
+                <q-btn label="Cancelar" color="red" class="float-right" @click="clearForm()" flat></q-btn>
+              </div>
+              </div>
           </div>
         </q-form>
       </div>
-      <div class="col-12 q-gutter-md">
+      <div class="col-9 q-gutter-md">
         <q-table  dense flat bordered :data="posts" :columns="columns" row-key="name">
           <template v-slot:top>
             <span class="text-h5">Contratos</span>
@@ -105,8 +105,7 @@ export default {
       arquivo: null,
       form,
       columns: [
-        { name: 'contSid', label: 'ID', field: 'contSid', sortable: true, aling: 'left' },
-        { name: 'contNum', label: 'N Contrato', field: 'contNum', sortable: true, aling: 'left' },
+        { name: 'contNum', label: 'Nº', field: 'contNum', sortable: true, aling: 'left' },
         { name: 'contTipo', label: 'Tipo', field: 'contTipo', sortable: true, aling: 'left' },
         { name: 'contNome', label: 'Nome', field: 'contNome', sortable: true, aling: 'left' },
         { name: 'contDtIn', label: 'Data inicio', field: 'contDtIn', sortable: true, aling: 'left' },

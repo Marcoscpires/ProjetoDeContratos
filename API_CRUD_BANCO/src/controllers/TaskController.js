@@ -16,7 +16,25 @@ class TaskController {
     }
     listarContratos(request, response){
         database.select("*").table("contratos").then(contratos=>{
-            response.json(contratos)
+            const contratosFormatados = contratos.map(contrato => {
+            return{
+                contDtIn: format(new Date(contrato.contDtIn), 'dd/MM/yyyy', { awareOfUnicodeTokens: true }),
+                contDtFim: format(new Date(contrato.contDtFim), 'dd/MM/yyyy', { awareOfUnicodeTokens: true }),
+                contIndiceAjuste: contrato.contIndiceAjuste,
+                contNome: contrato.contNome,
+                contNum: contrato.contNum,
+                contObjContrato: contrato.contObjContrato,
+                contPenalidadeRescisao: contrato.contPenalidadeRescisao,
+                contPrazoDununcia: contrato.contPrazoDununcia,
+                contPrazoPGT: contrato.contPrazoPGT,
+                contRenovacaoAuto: contrato.contRenovacaoAuto,
+                contSid: contrato.contSid,
+                contTipo: contrato.contTipo,
+                contValor: contrato.contValor,
+                file: contrato.files
+            }
+        })
+        response.json(contratosFormatados)
         }).catch(error=>{
             console.log(error)
         })
@@ -89,7 +107,7 @@ class TaskController {
                 }
                     console.log('Arquivo enviado com sucesso')   
             })
-            database.where({ contNum: id }).update({ file: id }).table("contratos").then(data => {
+            database.where({ contNum: id }).update({ files: id }).table("contratos").then(data => {
                 response.log('Contrato atualizado co sucesso')
             }).catch(error => {
                 response.status(500).json(error)
