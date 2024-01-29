@@ -178,7 +178,7 @@ export default {
     },
 
     async downloadFile (id) {
-      window.open(`http://10.4.0.151:1623/contratos/download/${id}`)
+      window.open(`http://187.49.94.173:4321/contratos/download/${id}`)
     },
 
     async handleEditPost (id) {
